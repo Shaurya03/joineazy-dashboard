@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { Assignment, Submission, User } from "../types"
 import AssignmentForm from "./AssignmentForm"
 
@@ -7,6 +8,8 @@ type AdminDashboardProps = {
   submissions: Submission[]
   users: User[]
   onCreateAssignment: (assignment: Assignment) => void
+  onDeleteAssignment: (assignmentId: string) => void
+  onUpdateAssignment: (assignment: Assignment) => void
 }
 
 function AdminDashboard({
@@ -14,8 +17,14 @@ function AdminDashboard({
   assignments,
   submissions,
   users,
-  onCreateAssignment
+  onCreateAssignment,
+  onDeleteAssignment,
+  onUpdateAssignment
 }: AdminDashboardProps) {
+
+  const [editingAssignment, setEditingAssignment] =
+    useState<Assignment | undefined>()
+
   const adminAssignments = assignments.filter(
     (assignment) => assignment.createdBy === currentUser.id
   )
@@ -38,7 +47,12 @@ function AdminDashboard({
 
       <AssignmentForm
         currentUserId={currentUser.id}
+        assignmentToEdit={editingAssignment}
         onCreateAssignment={onCreateAssignment}
+        onUpdateAssignment={(assignment) => {
+          onUpdateAssignment(assignment)
+          setEditingAssignment(undefined)
+        }}
       />
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -47,9 +61,29 @@ function AdminDashboard({
             key={assignment.id}
             className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
           >
-            <h2 className="text-lg font-semibold text-gray-900">
-              {assignment.title}
-            </h2>
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {assignment.title}
+              </h2>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingAssignment(assignment)}
+                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onDeleteAssignment(assignment.id)}
+                  className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
 
             <p className="mt-2 text-sm text-gray-600">
               {assignment.description}

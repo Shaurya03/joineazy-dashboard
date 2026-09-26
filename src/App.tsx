@@ -36,6 +36,44 @@ function App() {
       ...currentAssignments,
       assignment,
     ])
+
+    const newSubmissions = users
+      .filter((user) => user.role === "student")
+      .map((student) => ({
+        id: `submission-${Date.now()}-${student.id}`,
+        assignmentId: assignment.id,
+        studentId: student.id,
+        status: "not-submitted" as const,
+      }))
+
+    setSubmissionData((currentSubmissions) => [
+      ...currentSubmissions,
+      ...newSubmissions,
+    ])
+  }
+
+  const handleUpdateAssignment = (updatedAssignment: Assignment) => {
+    setAssignmentData((currentAssignments) =>
+      currentAssignments.map((assignment) =>
+        assignment.id === updatedAssignment.id
+          ? updatedAssignment
+          : assignment
+      )
+    )
+  }
+
+  const handleDeleteAssignment = (assignmentId: string) => {
+    setAssignmentData((currentAssignments) =>
+      currentAssignments.filter(
+        (assignment) => assignment.id !== assignmentId
+      )
+    )
+
+    setSubmissionData((currentSubmissions) =>
+      currentSubmissions.filter(
+        (submission) => submission.assignmentId !== assignmentId
+      )
+    )
   }
 
   const handleConfirmSubmission = (assignmentId: string) => {
@@ -77,6 +115,8 @@ function App() {
                 submissions={submissionData}
                 users={users}
                 onCreateAssignment={handleCreateAssignment}
+                onDeleteAssignment={handleDeleteAssignment}
+                onUpdateAssignment={handleUpdateAssignment}
               />
             ) : (
               <>
