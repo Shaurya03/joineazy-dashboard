@@ -13,6 +13,15 @@ function App() {
     (submission) => submission.studentId === currentUserId
   )
 
+  const submittedCount = studentSubmissions.filter(
+    (submission) => submission.status === "submitted"
+  ).length
+
+  const progress =
+    assignments.length === 0
+      ? 0
+      : Math.round((submittedCount / assignments.length) * 100)
+
   const handleConfirmSubmission = (assignmentId: string) => {
     setSubmissionData((currentSubmissions) =>
       currentSubmissions.map((submission) =>
@@ -45,6 +54,31 @@ function App() {
               <p className="mt-1 text-sm text-gray-600">
                 Track your assignments and submission progress.
               </p>
+            </div>
+
+            <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">
+                    Overall Progress
+                  </p>
+
+                  <p className="mt-1 text-2xl font-bold text-gray-900">
+                    {progress}%
+                  </p>
+                </div>
+
+                <p className="text-sm text-gray-500">
+                  {submittedCount} of {assignments.length} submitted
+                </p>
+              </div>
+
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-200">
+                <div
+                  className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
 
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
