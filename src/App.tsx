@@ -2,12 +2,17 @@ import { useState } from "react"
 import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
 import AssignmentCard from "./components/AssignmentCard"
-import { assignments, submissions } from "./data/mockData"
+import UserSwitcher from "./components/UserSwitcher"
+import { assignments, submissions, users } from "./data/mockData"
 
 function App() {
-  const currentUserId = "student-1"
 
+  const [currentUserId, setCurrentUserId] = useState("student-1")
   const [submissionData, setSubmissionData] = useState(submissions)
+
+  const currentUser = users.find(
+    (user) => user.id === currentUserId
+  )
 
   const studentSubmissions = submissionData.filter(
     (submission) => submission.studentId === currentUserId
@@ -45,6 +50,16 @@ function App() {
         <Sidebar />
 
         <main className="flex-1 p-6">
+          <p className="text-sm text-gray-500">
+            Logged in as: {currentUser?.name} ({currentUser?.role})
+          </p>
+          <div className="mb-6 flex justify-end">
+            <UserSwitcher
+              users={users}
+              currentUserId={currentUserId}
+              onUserChange={setCurrentUserId}
+            />
+          </div>
           <div className="mx-auto max-w-6xl">
             <div className="mb-8">
               <h1 className="text-2xl font-bold text-gray-900">
