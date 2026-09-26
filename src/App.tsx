@@ -5,10 +5,13 @@ import AssignmentCard from "./components/AssignmentCard"
 import UserSwitcher from "./components/UserSwitcher"
 import AdminDashboard from "./components/AdminDashboard"
 import { assignments, submissions, users } from "./data/mockData"
+import type { Assignment } from "./types"
 
 function App() {
 
   const [currentUserId, setCurrentUserId] = useState("student-1")
+
+  const [assignmentData, setAssignmentData] = useState(assignments)
   const [submissionData, setSubmissionData] = useState(submissions)
 
   const currentUser = users.find(
@@ -24,9 +27,16 @@ function App() {
   ).length
 
   const progress =
-    assignments.length === 0
+    assignmentData.length === 0
       ? 0
-      : Math.round((submittedCount / assignments.length) * 100)
+      : Math.round((submittedCount / assignmentData.length) * 100)
+
+  const handleCreateAssignment = (assignment: Assignment) => {
+    setAssignmentData((currentAssignments) => [
+      ...currentAssignments,
+      assignment,
+    ])
+  }
 
   const handleConfirmSubmission = (assignmentId: string) => {
     setSubmissionData((currentSubmissions) =>
@@ -63,9 +73,10 @@ function App() {
             {currentUser?.role === "admin" ? (
               <AdminDashboard
                 currentUser={currentUser}
-                assignments={assignments}
+                assignments={assignmentData}
                 submissions={submissionData}
                 users={users}
+                onCreateAssignment={handleCreateAssignment}
               />
             ) : (
               <>
@@ -92,7 +103,7 @@ function App() {
                     </div>
 
                     <p className="text-sm text-gray-500">
-                      {submittedCount} of {assignments.length} submitted
+                      {submittedCount} of {assignmentData.length} submitted
                     </p>
                   </div>
 
@@ -105,7 +116,7 @@ function App() {
                 </div>
 
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                  {assignments.map((assignment) => {
+                  {assignmentData.map((assignment) => {
                     const submission = studentSubmissions.find(
                       (submission) =>
                         submission.assignmentId === assignment.id

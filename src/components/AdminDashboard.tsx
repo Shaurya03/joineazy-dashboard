@@ -1,10 +1,12 @@
 import type { Assignment, Submission, User } from "../types"
+import AssignmentForm from "./AssignmentForm"
 
 type AdminDashboardProps = {
   currentUser: User
   assignments: Assignment[]
   submissions: Submission[]
   users: User[]
+  onCreateAssignment: (assignment: Assignment) => void
 }
 
 function AdminDashboard({
@@ -12,6 +14,7 @@ function AdminDashboard({
   assignments,
   submissions,
   users,
+  onCreateAssignment
 }: AdminDashboardProps) {
   const adminAssignments = assignments.filter(
     (assignment) => assignment.createdBy === currentUser.id
@@ -32,6 +35,11 @@ function AdminDashboard({
           Manage assignments and track student submissions.
         </p>
       </div>
+
+      <AssignmentForm
+        currentUserId={currentUser.id}
+        onCreateAssignment={onCreateAssignment}
+      />
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {adminAssignments.map((assignment) => (
