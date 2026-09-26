@@ -1,18 +1,45 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
 import AssignmentCard from "./components/AssignmentCard"
 import UserSwitcher from "./components/UserSwitcher"
 import AdminDashboard from "./components/AdminDashboard"
 import { assignments, submissions, users } from "./data/mockData"
-import type { Assignment } from "./types"
+import type { Assignment, Submission } from "./types"
 
 function App() {
 
   const [currentUserId, setCurrentUserId] = useState("student-1")
 
-  const [assignmentData, setAssignmentData] = useState(assignments)
-  const [submissionData, setSubmissionData] = useState(submissions)
+  const [assignmentData, setAssignmentData] = useState<Assignment[]>(() => {
+    const storedAssignments = localStorage.getItem("assignments")
+
+    return storedAssignments
+      ? JSON.parse(storedAssignments)
+      : assignments
+  })
+
+  const [submissionData, setSubmissionData] = useState<Submission[]>(() => {
+    const storedSubmissions = localStorage.getItem("submissions")
+
+    return storedSubmissions
+      ? JSON.parse(storedSubmissions)
+      : submissions
+  })
+
+  useEffect(() => {
+    localStorage.setItem(
+      "assignments",
+      JSON.stringify(assignmentData)
+    )
+  }, [assignmentData])
+
+  useEffect(() => {
+    localStorage.setItem(
+      "submissions",
+      JSON.stringify(submissionData)
+    )
+  }, [submissionData])
 
   const currentUser = users.find(
     (user) => user.id === currentUserId
