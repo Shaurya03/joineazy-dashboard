@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react"
 import Navbar from "./components/Navbar"
-import AssignmentCard from "./components/AssignmentCard"
 import AdminDashboard from "./components/AdminDashboard"
+import StudentDashboard from "./components/StudentDashboard"
 import Login from "./components/Login"
 import { assignments, submissions, users } from "./data/mockData"
 import type { Assignment, Submission, User } from "./types"
 
 function App() {
-
   const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
     return localStorage.getItem("currentUserId")
   })
@@ -45,19 +44,6 @@ function App() {
   const currentUser = users.find(
     (user) => user.id === currentUserId
   )
-
-  const studentSubmissions = submissionData.filter(
-    (submission) => submission.studentId === currentUserId
-  )
-
-  const submittedCount = studentSubmissions.filter(
-    (submission) => submission.status === "submitted"
-  ).length
-
-  const progress =
-    assignmentData.length === 0
-      ? 0
-      : Math.round((submittedCount / assignmentData.length) * 100)
 
   const handleLogin = (user: User) => {
     setCurrentUserId(user.id)
@@ -142,8 +128,8 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <Navbar onLogout={handleLogout} />
 
-      <main className="mx-auto max-w-6xl">
-        {currentUser?.role === "admin" ? (
+      <main className="mx-auto max-w-6xl p-6">
+        {currentUser.role === "admin" ? (
           <AdminDashboard
             currentUser={currentUser}
             assignments={assignmentData}
@@ -154,64 +140,12 @@ function App() {
             onUpdateAssignment={handleUpdateAssignment}
           />
         ) : (
-          <>
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">
-                My Assignments
-              </h1>
-
-              <p className="mt-1 text-sm text-gray-600">
-                Track your assignments and submission progress.
-              </p>
-            </div>
-
-            <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-700">
-                    Overall Progress
-                  </p>
-
-                  <p className="mt-1 text-3xl font-bold tracking-tight text-gray-900">
-                    {progress}%
-                  </p>
-                </div>
-
-                <p className="text-sm text-gray-500">
-                  {submittedCount} of {assignmentData.length} submitted
-                </p>
-              </div>
-
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className="h-full rounded-full bg-blue-600 transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {assignmentData.map((assignment) => {
-                const submission = studentSubmissions.find(
-                  (submission) =>
-                    submission.assignmentId === assignment.id
-                )
-
-                return (
-                  <AssignmentCard
-                    key={assignment.id}
-                    assignment={assignment}
-                    submissionStatus={
-                      submission?.status ?? "not-submitted"
-                    }
-                    onConfirmSubmission={() =>
-                      handleConfirmSubmission(assignment.id)
-                    }
-                  />
-                )
-              })}
-            </div>
-          </>
+          <StudentDashboard
+            currentUser={currentUser}
+            assignments={assignmentData}
+            submissions={submissionData}
+            onConfirmSubmission={handleConfirmSubmission}
+          />
         )}
       </main>
     </div>
