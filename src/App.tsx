@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import Navbar from "./components/Navbar"
-import Sidebar from "./components/Sidebar"
 import AssignmentCard from "./components/AssignmentCard"
 import AdminDashboard from "./components/AdminDashboard"
 import Login from "./components/Login"
@@ -143,85 +142,78 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <Navbar onLogout={handleLogout} />
 
-      <div className="flex">
-        <Sidebar />
+      <main className="mx-auto max-w-6xl">
+        {currentUser?.role === "admin" ? (
+          <AdminDashboard
+            currentUser={currentUser}
+            assignments={assignmentData}
+            submissions={submissionData}
+            users={users}
+            onCreateAssignment={handleCreateAssignment}
+            onDeleteAssignment={handleDeleteAssignment}
+            onUpdateAssignment={handleUpdateAssignment}
+          />
+        ) : (
+          <>
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-gray-900">
+                My Assignments
+              </h1>
 
-        <main className="flex-1 p-6">
+              <p className="mt-1 text-sm text-gray-600">
+                Track your assignments and submission progress.
+              </p>
+            </div>
 
-          <div className="mx-auto max-w-6xl">
-            {currentUser?.role === "admin" ? (
-              <AdminDashboard
-                currentUser={currentUser}
-                assignments={assignmentData}
-                submissions={submissionData}
-                users={users}
-                onCreateAssignment={handleCreateAssignment}
-                onDeleteAssignment={handleDeleteAssignment}
-                onUpdateAssignment={handleUpdateAssignment}
-              />
-            ) : (
-              <>
-                <div className="mb-8">
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    My Assignments
-                  </h1>
+            <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">
+                    Overall Progress
+                  </p>
 
-                  <p className="mt-1 text-sm text-gray-600">
-                    Track your assignments and submission progress.
+                  <p className="mt-1 text-3xl font-bold tracking-tight text-gray-900">
+                    {progress}%
                   </p>
                 </div>
 
-                <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">
-                        Overall Progress
-                      </p>
+                <p className="text-sm text-gray-500">
+                  {submittedCount} of {assignmentData.length} submitted
+                </p>
+              </div>
 
-                      <p className="mt-1 text-2xl font-bold text-gray-900">
-                        {progress}%
-                      </p>
-                    </div>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-200">
+                <div
+                  className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
 
-                    <p className="text-sm text-gray-500">
-                      {submittedCount} of {assignmentData.length} submitted
-                    </p>
-                  </div>
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {assignmentData.map((assignment) => {
+                const submission = studentSubmissions.find(
+                  (submission) =>
+                    submission.assignmentId === assignment.id
+                )
 
-                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-200">
-                    <div
-                      className="h-full rounded-full bg-blue-600 transition-all duration-300"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                  {assignmentData.map((assignment) => {
-                    const submission = studentSubmissions.find(
-                      (submission) =>
-                        submission.assignmentId === assignment.id
-                    )
-
-                    return (
-                      <AssignmentCard
-                        key={assignment.id}
-                        assignment={assignment}
-                        submissionStatus={
-                          submission?.status ?? "not-submitted"
-                        }
-                        onConfirmSubmission={() =>
-                          handleConfirmSubmission(assignment.id)
-                        }
-                      />
-                    )
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        </main>
-      </div>
+                return (
+                  <AssignmentCard
+                    key={assignment.id}
+                    assignment={assignment}
+                    submissionStatus={
+                      submission?.status ?? "not-submitted"
+                    }
+                    onConfirmSubmission={() =>
+                      handleConfirmSubmission(assignment.id)
+                    }
+                  />
+                )
+              })}
+            </div>
+          </>
+        )}
+      </main>
     </div>
   )
 }

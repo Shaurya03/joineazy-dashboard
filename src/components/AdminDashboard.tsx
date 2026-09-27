@@ -85,7 +85,7 @@ function AdminDashboard({
                 </div>
               </div>
 
-              <p className="mt-3 min-h-[48px] text-sm leading-6 text-gray-600">
+              <p className="mt-3 min-h-12 text-sm leading-6 text-gray-600">
                 {assignment.description}
               </p>
 
