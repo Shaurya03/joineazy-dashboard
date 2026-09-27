@@ -2,14 +2,16 @@ import { useState, useEffect } from "react"
 import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
 import AssignmentCard from "./components/AssignmentCard"
-import UserSwitcher from "./components/UserSwitcher"
 import AdminDashboard from "./components/AdminDashboard"
+import Login from "./components/Login"
 import { assignments, submissions, users } from "./data/mockData"
-import type { Assignment, Submission } from "./types"
+import type { Assignment, Submission, User } from "./types"
 
 function App() {
 
-  const [currentUserId, setCurrentUserId] = useState("student-1")
+  const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
+    return localStorage.getItem("currentUserId")
+  })
 
   const [assignmentData, setAssignmentData] = useState<Assignment[]>(() => {
     const storedAssignments = localStorage.getItem("assignments")
@@ -57,6 +59,16 @@ function App() {
     assignmentData.length === 0
       ? 0
       : Math.round((submittedCount / assignmentData.length) * 100)
+
+  const handleLogin = (user: User) => {
+    setCurrentUserId(user.id)
+    localStorage.setItem("currentUserId", user.id)
+  }
+
+  const handleLogout = () => {
+    setCurrentUserId(null)
+    localStorage.removeItem("currentUserId")
+  }
 
   const handleCreateAssignment = (assignment: Assignment) => {
     setAssignmentData((currentAssignments) => [
@@ -118,6 +130,15 @@ function App() {
     )
   }
 
+  if (!currentUser) {
+    return (
+      <Login
+        users={users}
+        onLogin={handleLogin}
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
@@ -126,13 +147,6 @@ function App() {
         <Sidebar />
 
         <main className="flex-1 p-6">
-          <div className="mb-6 flex justify-end">
-            <UserSwitcher
-              users={users}
-              currentUserId={currentUserId}
-              onUserChange={setCurrentUserId}
-            />
-          </div>
 
           <div className="mx-auto max-w-6xl">
             {currentUser?.role === "admin" ? (
