@@ -4,6 +4,14 @@ A responsive role-based dashboard for managing student assignments and tracking 
 
 This project was built as part of the **Joineazy Frontend Intern Assignment** using React, TypeScript, and Tailwind CSS.
 
+## Live Demo
+
+[View Live Demo](https://joineazy-dashboard-brown.vercel.app)
+
+## Repository
+
+[View Source Code](https://github.com/Shaurya03/joineazy-dashboard)
+
 ## Overview
 
 The application provides separate experiences for:
