@@ -19,9 +19,8 @@ function AdminDashboard({
   users,
   onCreateAssignment,
   onDeleteAssignment,
-  onUpdateAssignment
+  onUpdateAssignment,
 }: AdminDashboardProps) {
-
   const [editingAssignment, setEditingAssignment] =
     useState<Assignment | undefined>()
 
@@ -35,8 +34,8 @@ function AdminDashboard({
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
           Admin Dashboard
         </h1>
 
@@ -55,82 +54,112 @@ function AdminDashboard({
         }}
       />
 
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
         {adminAssignments.map((assignment) => (
-          <div
+          <article
             key={assignment.id}
-            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+            className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
           >
-            <div className="flex items-start justify-between gap-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {assignment.title}
-              </h2>
+            <div>
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="min-w-0 text-lg font-semibold leading-6 text-gray-900">
+                  {assignment.title}
+                </h2>
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditingAssignment(assignment)}
-                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Edit
-                </button>
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingAssignment(assignment)}
+                    className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                  >
+                    Edit
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => onDeleteAssignment(assignment.id)}
-                  className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
-                >
-                  Delete
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteAssignment(assignment.id)}
+                    className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              <p className="mt-3 min-h-[48px] text-sm leading-6 text-gray-600">
+                {assignment.description}
+              </p>
+
+              <p className="mt-4 text-sm text-gray-500">
+                Due: {assignment.dueDate}
+              </p>
+
+              <a
+                href={assignment.driveLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                Open Assignment
+                <span className="ml-1">↗</span>
+              </a>
+            </div>
+
+            <div className="mt-auto pt-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Student Progress
+                </h3>
+
+                <span className="text-xs text-gray-500">
+                  {students.length} students
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                {students.map((student) => {
+                  const submission = submissions.find(
+                    (submission) =>
+                      submission.assignmentId === assignment.id &&
+                      submission.studentId === student.id
+                  )
+
+                  const isSubmitted =
+                    submission?.status === "submitted"
+
+                  return (
+                    <div key={student.id}>
+                      <div className="mb-1.5 flex items-center justify-between gap-3">
+                        <span className="min-w-0 truncate text-sm font-medium text-gray-700">
+                          {student.name}
+                        </span>
+
+                        <span
+                          className={
+                            isSubmitted
+                              ? "shrink-0 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700"
+                              : "shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700"
+                          }
+                        >
+                          {isSubmitted
+                            ? "Submitted"
+                            : "Not submitted"}
+                        </span>
+                      </div>
+
+                      <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+                        <div
+                          className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                          style={{
+                            width: isSubmitted ? "100%" : "0%",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
-
-            <p className="mt-2 text-sm text-gray-600">
-              {assignment.description}
-            </p>
-
-            <p className="mt-4 text-sm text-gray-500">
-              Due: {assignment.dueDate}
-            </p>
-
-            <div className="mt-5 space-y-4">
-              {students.map((student) => {
-                const submission = submissions.find(
-                  (submission) =>
-                    submission.assignmentId === assignment.id &&
-                    submission.studentId === student.id
-                )
-
-                const isSubmitted =
-                  submission?.status === "submitted"
-
-                return (
-                  <div key={student.id}>
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">
-                        {student.name}
-                      </span>
-
-                      <span className="text-xs text-gray-500">
-                        {isSubmitted
-                          ? "Submitted"
-                          : "Not submitted"}
-                      </span>
-                    </div>
-
-                    <div className="h-2 overflow-hidden rounded-full bg-gray-200">
-                      <div
-                        className="h-full rounded-full bg-blue-600"
-                        style={{
-                          width: isSubmitted ? "100%" : "0%",
-                        }}
-                      />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+          </article>
         ))}
       </div>
     </div>
