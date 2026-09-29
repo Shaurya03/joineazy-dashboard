@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import Navbar from "./components/Navbar"
 import Login from "./components/Login"
 import CourseDashboard from "./components/CourseDashboard"
+import CourseAssignments from "./components/CourseAssignments"
 import { courses, assignments, submissions, users } from "./data/mockData"
 import type { Assignment, Submission, User } from "./types"
 
@@ -11,6 +12,9 @@ function App() {
   })
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
+
+  const [selectedAssignmentId, setSelectedAssignmentId] =
+    useState<string | null>(null)
 
   const [assignmentData, setAssignmentData] = useState<Assignment[]>(() => {
     const storedAssignments = localStorage.getItem("assignments")
@@ -58,6 +62,16 @@ function App() {
 
   const handleCourseSelect = (courseId: string) => {
     setSelectedCourseId(courseId)
+  }
+
+  const selectedCourse = courses.find(
+    (course) => course.id === selectedCourseId
+  )
+
+  const handleAssignmentSelect = (
+    assignmentId: string
+  ) => {
+    setSelectedAssignmentId(assignmentId)
   }
 
   const handleCreateAssignment = (assignment: Assignment) => {
@@ -134,11 +148,22 @@ function App() {
       <Navbar onLogout={handleLogout} />
 
       <main className="mx-auto max-w-6xl p-6">
-        <CourseDashboard
-          currentUser={currentUser}
-          courses={courses}
-          onCourseSelect={handleCourseSelect}
-        />
+        {selectedCourse ? (
+          <CourseAssignments
+            currentUser={currentUser}
+            course={selectedCourse}
+            assignments={assignmentData}
+            submissions={submissionData}
+            onBack={() => setSelectedCourseId(null)}
+            onAssignmentSelect={handleAssignmentSelect}
+          />
+        ) : (
+          <CourseDashboard
+            currentUser={currentUser}
+            courses={courses}
+            onCourseSelect={handleCourseSelect}
+          />
+        )}
       </main>
     </div>
   )
