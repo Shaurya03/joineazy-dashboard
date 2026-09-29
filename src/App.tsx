@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar"
 import Login from "./components/Login"
 import CourseDashboard from "./components/CourseDashboard"
 import CourseAssignments from "./components/CourseAssignments"
+import AssignmentDetails from "./components/AssignmentDetails"
 import { courses, assignments, submissions, users } from "./data/mockData"
 import type { Assignment, Submission, User } from "./types"
 
@@ -73,6 +74,10 @@ function App() {
   ) => {
     setSelectedAssignmentId(assignmentId)
   }
+
+  const selectedAssignment = assignmentData.find(
+    (assignment) => assignment.id === selectedAssignmentId
+  )
 
   const handleCreateAssignment = (assignment: Assignment) => {
     setAssignmentData((currentAssignments) => [
@@ -148,7 +153,15 @@ function App() {
       <Navbar onLogout={handleLogout} />
 
       <main className="mx-auto max-w-6xl p-6">
-        {selectedCourse ? (
+        {selectedCourse && selectedAssignment ? (
+          <AssignmentDetails
+            currentUser={currentUser}
+            assignment={selectedAssignment}
+            course={selectedCourse}
+            submissions={submissionData}
+            onBack={() => setSelectedAssignmentId(null)}
+          />
+        ) : selectedCourse ? (
           <CourseAssignments
             currentUser={currentUser}
             course={selectedCourse}
