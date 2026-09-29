@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react"
 import Navbar from "./components/Navbar"
-import AdminDashboard from "./components/AdminDashboard"
-import StudentDashboard from "./components/StudentDashboard"
 import Login from "./components/Login"
-import { assignments, submissions, users } from "./data/mockData"
+import CourseDashboard from "./components/CourseDashboard"
+import { courses, assignments, submissions, users } from "./data/mockData"
 import type { Assignment, Submission, User } from "./types"
 
 function App() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
     return localStorage.getItem("currentUserId")
   })
+
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
 
   const [assignmentData, setAssignmentData] = useState<Assignment[]>(() => {
     const storedAssignments = localStorage.getItem("assignments")
@@ -53,6 +54,10 @@ function App() {
   const handleLogout = () => {
     setCurrentUserId(null)
     localStorage.removeItem("currentUserId")
+  }
+
+  const handleCourseSelect = (courseId: string) => {
+    setSelectedCourseId(courseId)
   }
 
   const handleCreateAssignment = (assignment: Assignment) => {
@@ -129,24 +134,11 @@ function App() {
       <Navbar onLogout={handleLogout} />
 
       <main className="mx-auto max-w-6xl p-6">
-        {currentUser.role === "admin" ? (
-          <AdminDashboard
-            currentUser={currentUser}
-            assignments={assignmentData}
-            submissions={submissionData}
-            users={users}
-            onCreateAssignment={handleCreateAssignment}
-            onDeleteAssignment={handleDeleteAssignment}
-            onUpdateAssignment={handleUpdateAssignment}
-          />
-        ) : (
-          <StudentDashboard
-            currentUser={currentUser}
-            assignments={assignmentData}
-            submissions={submissionData}
-            onConfirmSubmission={handleConfirmSubmission}
-          />
-        )}
+        <CourseDashboard
+          currentUser={currentUser}
+          courses={courses}
+          onCourseSelect={handleCourseSelect}
+        />
       </main>
     </div>
   )
