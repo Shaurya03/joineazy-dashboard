@@ -46,7 +46,7 @@ function AssignmentCard({
 
           <div className="mt-auto flex items-center justify-between gap-3 pt-5">
             <a
-              href={assignment.driveLink}
+              href={assignment.oneDriveLink}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"

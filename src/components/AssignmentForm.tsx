@@ -26,15 +26,15 @@ function AssignmentForm({
     assignmentToEdit?.dueDate ?? ""
   )
 
-  const [driveLink, setDriveLink] = useState(
-    assignmentToEdit?.driveLink ?? ""
+  const [oneDriveLink, setOneDriveLink] = useState(
+    assignmentToEdit?.oneDriveLink ?? ""
   )
 
   useEffect(() => {
     setTitle(assignmentToEdit?.title ?? "")
     setDescription(assignmentToEdit?.description ?? "")
     setDueDate(assignmentToEdit?.dueDate ?? "")
-    setDriveLink(assignmentToEdit?.driveLink ?? "")
+    setOneDriveLink(assignmentToEdit?.oneDriveLink ?? "")
   }, [assignmentToEdit])
 
   const handleSubmit = (
@@ -48,15 +48,17 @@ function AssignmentForm({
         title,
         description,
         dueDate,
-        driveLink,
+        oneDriveLink,
       })
     } else {
       const newAssignment: Assignment = {
         id: `assignment-${Date.now()}`,
+        courseId: "course-1",
         title,
         description,
         dueDate,
-        driveLink,
+        oneDriveLink,
+        submissionType: "individual",
         createdBy: currentUserId,
       }
 
@@ -66,7 +68,7 @@ function AssignmentForm({
     setTitle("")
     setDescription("")
     setDueDate("")
-    setDriveLink("")
+    setOneDriveLink("")
   }
 
   return (
@@ -130,14 +132,14 @@ function AssignmentForm({
 
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Google Drive Link
+              OneDrive Link
             </label>
 
             <input
               type="url"
-              value={driveLink}
+              value={oneDriveLink}
               onChange={(event) =>
-                setDriveLink(event.target.value)
+                setOneDriveLink(event.target.value)
               }
               required
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"

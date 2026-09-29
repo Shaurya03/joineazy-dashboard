@@ -94,7 +94,7 @@ function AdminDashboard({
               </p>
 
               <a
-                href={assignment.driveLink}
+                href={assignment.oneDriveLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
