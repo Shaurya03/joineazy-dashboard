@@ -79,6 +79,23 @@ function App() {
     (assignment) => assignment.id === selectedAssignmentId
   )
 
+  const handleAcknowledgeSubmission = (
+    assignmentId: string
+  ) => {
+    setSubmissionData((currentSubmissions) =>
+      currentSubmissions.map((submission) =>
+        submission.assignmentId === assignmentId &&
+          submission.studentId === currentUserId
+          ? {
+            ...submission,
+            status: "submitted",
+            acknowledgedAt: new Date().toISOString(),
+          }
+          : submission
+      )
+    )
+  }
+
   const handleCreateAssignment = (assignment: Assignment) => {
     setAssignmentData((currentAssignments) => [
       ...currentAssignments,
@@ -160,6 +177,7 @@ function App() {
             course={selectedCourse}
             submissions={submissionData}
             onBack={() => setSelectedAssignmentId(null)}
+            onAcknowledge={handleAcknowledgeSubmission}
           />
         ) : selectedCourse ? (
           <CourseAssignments

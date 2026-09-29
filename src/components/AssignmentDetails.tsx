@@ -11,6 +11,7 @@ type AssignmentDetailsProps = {
   course: Course
   submissions: Submission[]
   onBack: () => void
+  onAcknowledge: (assignmentId: string) => void
 }
 
 function AssignmentDetails({
@@ -19,6 +20,7 @@ function AssignmentDetails({
   course,
   submissions,
   onBack,
+  onAcknowledge
 }: AssignmentDetailsProps) {
   const isProfessor = currentUser.role === "admin"
 
@@ -63,8 +65,8 @@ function AssignmentDetails({
 
                 <span
                   className={`rounded-full px-2.5 py-1 text-xs font-medium ${assignment.submissionType === "group"
-                      ? "bg-violet-50 text-violet-700"
-                      : "bg-blue-50 text-blue-700"
+                    ? "bg-violet-50 text-violet-700"
+                    : "bg-blue-50 text-blue-700"
                     }`}
                 >
                   {assignment.submissionType === "group"
@@ -85,8 +87,8 @@ function AssignmentDetails({
             {!isProfessor && (
               <span
                 className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ${isSubmitted
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-amber-50 text-amber-700"
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-amber-50 text-amber-700"
                   }`}
               >
                 {isSubmitted
@@ -132,26 +134,95 @@ function AssignmentDetails({
         </div>
 
         <div className="border-t border-gray-100 bg-gray-50/70 p-6 sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">
-                Submission workspace
-              </h2>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-gray-900">
+                  Submission workspace
+                </h2>
 
-              <p className="mt-1 text-sm text-gray-500">
-                Open the shared OneDrive location for this assignment.
-              </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Open the shared OneDrive location for this assignment.
+                </p>
+              </div>
+
+              <a
+                href={assignment.oneDriveLink}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+              >
+                Open OneDrive
+                <span className="ml-2">↗</span>
+              </a>
             </div>
 
-            <a
-              href={assignment.oneDriveLink}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
-            >
-              Open OneDrive
-              <span className="ml-2">↗</span>
-            </a>
+            {!isProfessor &&
+              assignment.submissionType === "individual" && (
+                <div className="rounded-xl border border-gray-200 bg-white p-5">
+                  {isSubmitted ? (
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-emerald-700">
+                          Submission acknowledged
+                        </p>
+
+                        <p className="mt-1 text-sm text-gray-500">
+                          {studentSubmission?.acknowledgedAt
+                            ? `Acknowledged on ${new Date(
+                              studentSubmission.acknowledgedAt
+                            ).toLocaleString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}`
+                            : "Your submission has been acknowledged."}
+                        </p>
+                      </div>
+
+                      <span className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                        ✓ Acknowledged
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">
+                          Have you submitted your work?
+                        </p>
+
+                        <p className="mt-1 text-sm text-gray-500">
+                          Confirm your submission after uploading your work
+                          to OneDrive.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => onAcknowledge(assignment.id)}
+                        className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                      >
+                        Acknowledge Submission
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+            {!isProfessor &&
+              assignment.submissionType === "group" && (
+                <div className="rounded-xl border border-violet-100 bg-violet-50 p-5">
+                  <p className="text-sm font-semibold text-violet-900">
+                    Group submission
+                  </p>
+
+                  <p className="mt-1 text-sm text-violet-700">
+                    Group acknowledgment will be available here.
+                  </p>
+                </div>
+              )}
           </div>
         </div>
       </div>
