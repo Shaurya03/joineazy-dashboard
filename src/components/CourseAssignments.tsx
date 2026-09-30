@@ -380,6 +380,7 @@ function CourseAssignments({
               ? "animate-[fadeOut_0.18s_ease-in_forwards]"
               : "animate-[fadeIn_0.18s_ease-out]"
             }`}
+          onClick={handleCloseDeleteModal}
         >
           <div
             className={`w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl ${isClosing
@@ -389,6 +390,7 @@ function CourseAssignments({
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-assignment-title"
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-sm font-semibold text-red-600">
