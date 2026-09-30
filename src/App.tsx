@@ -4,6 +4,7 @@ import Login from "./components/Login"
 import CourseDashboard from "./components/CourseDashboard"
 import CourseAssignments from "./components/CourseAssignments"
 import AssignmentDetails from "./components/AssignmentDetails"
+import AssignmentForm from "./components/AssignmentForm"
 import { courses, assignments, submissions, users, groups, groupMembers } from "./data/mockData"
 import type { Assignment, Submission, User, Group, GroupMember } from "./types"
 
@@ -14,8 +15,9 @@ function App() {
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
 
-  const [selectedAssignmentId, setSelectedAssignmentId] =
-    useState<string | null>(null)
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null)
+
+  const [isAssignmentFormOpen, setIsAssignmentFormOpen] = useState(false)
 
   const [assignmentData, setAssignmentData] = useState<Assignment[]>(() => {
     const storedAssignments = localStorage.getItem("assignments")
@@ -271,14 +273,32 @@ function App() {
       assignment,
     ])
 
-    const newSubmissions = users
-      .filter((user) => user.role === "student")
-      .map((student) => ({
+    if (assignment.submissionType === "group") {
+      return
+    }
+
+    const course = courses.find(
+      (course) => course.id === assignment.courseId
+    )
+
+    if (!course) {
+      return
+    }
+
+    const enrolledStudents = users.filter(
+      (user) =>
+        user.role === "student" &&
+        course.studentIds.includes(user.id)
+    )
+
+    const newSubmissions: Submission[] = enrolledStudents.map(
+      (student) => ({
         id: `submission-${Date.now()}-${student.id}`,
         assignmentId: assignment.id,
         studentId: student.id,
-        status: "not-submitted" as const,
-      }))
+        status: "not-submitted",
+      })
+    )
 
     setSubmissionData((currentSubmissions) => [
       ...currentSubmissions,
@@ -355,14 +375,32 @@ function App() {
             onJoinGroup={handleJoinGroup}
           />
         ) : selectedCourse ? (
-          <CourseAssignments
-            currentUser={currentUser}
-            course={selectedCourse}
-            assignments={assignmentData}
-            submissions={submissionData}
-            onBack={() => setSelectedCourseId(null)}
-            onAssignmentSelect={handleAssignmentSelect}
-          />
+          <>
+            {isAssignmentFormOpen && currentUser.role === "admin" && (
+              <AssignmentForm
+                currentUserId={currentUser.id}
+                courseId={selectedCourse.id}
+                onCreateAssignment={(assignment) => {
+                  handleCreateAssignment(assignment)
+                  setIsAssignmentFormOpen(false)
+                }}
+                onUpdateAssignment={handleUpdateAssignment}
+              />
+            )}
+
+            <CourseAssignments
+              currentUser={currentUser}
+              course={selectedCourse}
+              assignments={assignmentData}
+              submissions={submissionData}
+              onBack={() => {
+                setSelectedCourseId(null)
+                setIsAssignmentFormOpen(false)
+              }}
+              onAssignmentSelect={handleAssignmentSelect}
+              onCreateAssignment={() => setIsAssignmentFormOpen(true)}
+            />
+          </>
         ) : (
           <CourseDashboard
             currentUser={currentUser}

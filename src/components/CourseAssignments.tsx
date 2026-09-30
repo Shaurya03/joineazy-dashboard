@@ -7,6 +7,7 @@ type CourseAssignmentsProps = {
   submissions: Submission[]
   onBack: () => void
   onAssignmentSelect: (assignmentId: string) => void
+  onCreateAssignment: () => void
 }
 
 function CourseAssignments({
@@ -16,6 +17,7 @@ function CourseAssignments({
   submissions,
   onBack,
   onAssignmentSelect,
+  onCreateAssignment
 }: CourseAssignmentsProps) {
   const courseAssignments = assignments.filter(
     (assignment) => assignment.courseId === course.id
@@ -69,6 +71,16 @@ function CourseAssignments({
             </p>
           </div>
 
+          {isProfessor && (
+            <button
+              type="button"
+              onClick={onCreateAssignment}
+              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+            >
+              + Create Assignment
+            </button>
+          )}
+
           <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
             <p className="text-xs text-gray-500">
               Assignments
@@ -115,8 +127,8 @@ function CourseAssignments({
 
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium ${assignment.submissionType === "group"
-                            ? "bg-violet-50 text-violet-700"
-                            : "bg-blue-50 text-blue-700"
+                          ? "bg-violet-50 text-violet-700"
+                          : "bg-blue-50 text-blue-700"
                           }`}
                       >
                         {assignment.submissionType === "group"

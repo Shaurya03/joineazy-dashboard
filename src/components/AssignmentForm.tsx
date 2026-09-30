@@ -3,6 +3,7 @@ import type { Assignment } from "../types"
 
 type AssignmentFormProps = {
   currentUserId: string
+  courseId: string
   assignmentToEdit?: Assignment
   onCreateAssignment: (assignment: Assignment) => void
   onUpdateAssignment: (assignment: Assignment) => void
@@ -10,6 +11,7 @@ type AssignmentFormProps = {
 
 function AssignmentForm({
   currentUserId,
+  courseId,
   assignmentToEdit,
   onCreateAssignment,
   onUpdateAssignment,
@@ -30,11 +32,20 @@ function AssignmentForm({
     assignmentToEdit?.oneDriveLink ?? ""
   )
 
+  const [submissionType, setSubmissionType] = useState<
+    "individual" | "group"
+  >(
+    assignmentToEdit?.submissionType ?? "individual"
+  )
+
   useEffect(() => {
     setTitle(assignmentToEdit?.title ?? "")
     setDescription(assignmentToEdit?.description ?? "")
     setDueDate(assignmentToEdit?.dueDate ?? "")
     setOneDriveLink(assignmentToEdit?.oneDriveLink ?? "")
+    setSubmissionType(
+      assignmentToEdit?.submissionType ?? "individual"
+    )
   }, [assignmentToEdit])
 
   const handleSubmit = (
@@ -49,16 +60,17 @@ function AssignmentForm({
         description,
         dueDate,
         oneDriveLink,
+        submissionType
       })
     } else {
       const newAssignment: Assignment = {
         id: `assignment-${Date.now()}`,
-        courseId: "course-1",
+        courseId,
         title,
         description,
         dueDate,
         oneDriveLink,
-        submissionType: "individual",
+        submissionType,
         createdBy: currentUserId,
       }
 
@@ -69,6 +81,7 @@ function AssignmentForm({
     setDescription("")
     setDueDate("")
     setOneDriveLink("")
+    setSubmissionType("individual")
   }
 
   return (
@@ -143,8 +156,32 @@ function AssignmentForm({
               }
               required
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
-              placeholder="https://drive.google.com/..."
+              placeholder="https://onedrive.live.com/example/assignment"
             />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Submission Type
+            </label>
+
+            <select
+              value={submissionType}
+              onChange={(event) =>
+                setSubmissionType(
+                  event.target.value as "individual" | "group"
+                )
+              }
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+            >
+              <option value="individual">
+                Individual
+              </option>
+
+              <option value="group">
+                Group
+              </option>
+            </select>
           </div>
         </div>
 
