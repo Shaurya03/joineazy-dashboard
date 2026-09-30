@@ -15,6 +15,7 @@ type AssignmentDetailsProps = {
   submissions: Submission[]
   onBack: () => void
   onAcknowledge: (assignmentId: string) => void
+  onAcknowledgeGroupSubmission: (assignmentId: string) => void
   groups: Group[]
   groupMembers: GroupMember[]
   users: User[]
@@ -29,6 +30,7 @@ function AssignmentDetails({
   submissions,
   onBack,
   onAcknowledge,
+  onAcknowledgeGroupSubmission,
   groups,
   groupMembers,
   users,
@@ -55,6 +57,52 @@ function AssignmentDetails({
     hour: "numeric",
     minute: "2-digit",
   })
+
+  const currentMembership = groupMembers.find(
+    (member) =>
+      member.studentId === currentUser.id &&
+      groups.some(
+        (group) =>
+          group.id === member.groupId &&
+          group.courseId === course.id
+      )
+  )
+
+  const currentGroup = currentMembership
+    ? groups.find((group) => group.id === currentMembership.groupId)
+    : undefined
+
+  const currentGroupMembers = currentGroup
+    ? groupMembers
+      .filter((member) => member.groupId === currentGroup.id)
+      .map((member) => users.find((user) => user.id === member.studentId))
+      .filter(Boolean)
+    : []
+
+  const isGroupLeader =
+    currentGroup?.leaderId === currentUser.id
+
+  const groupSubmissions = currentGroup
+    ? submissions.filter(
+      (submission) =>
+        submission.assignmentId === assignment.id &&
+        submission.groupId === currentGroup.id
+    )
+    : []
+
+  const groupAcknowledged =
+    currentGroupMembers.length > 0 &&
+    currentGroupMembers.every((member) =>
+      groupSubmissions.some(
+        (submission) =>
+          submission.studentId === member?.id &&
+          submission.status === "submitted"
+      )
+    )
+
+  const groupAcknowledgedAt = groupSubmissions.find(
+    (submission) => submission.status === "submitted"
+  )?.acknowledgedAt
 
   return (
     <div>
@@ -236,6 +284,72 @@ function AssignmentDetails({
                   onJoinGroup={onJoinGroup}
                 />
               )}
+
+            {assignment.submissionType === "group" && currentGroup && (
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+                <div className="mb-4">
+                  <p className="text-sm font-semibold uppercase tracking-wide text-violet-600">
+                    Group submission
+                  </p>
+
+                  <h3 className="mt-1 text-xl font-semibold text-slate-900">
+                    {currentGroup.name}
+                  </h3>
+                </div>
+
+                {groupAcknowledged ? (
+                  <div className="rounded-xl bg-emerald-50 p-4">
+                    <p className="font-semibold text-emerald-700">
+                      Group submission acknowledged
+                    </p>
+
+                    {groupAcknowledgedAt && (
+                      <p className="mt-1 text-sm text-emerald-600">
+                        Acknowledged on{" "}
+                        {new Date(groupAcknowledgedAt).toLocaleString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    )}
+                  </div>
+                ) : isGroupLeader ? (
+                  <div className="rounded-xl bg-violet-50 p-4">
+                    <p className="font-medium text-slate-900">
+                      You are the Group Leader
+                    </p>
+
+                    <p className="mt-1 text-sm text-slate-600">
+                      Acknowledge the submission once your group has submitted the
+                      assignment.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onAcknowledgeGroupSubmission(assignment.id)
+                      }
+                      className="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                    >
+                      Acknowledge Group Submission
+                    </button>
+                  </div>
+                ) : (
+                  <div className="rounded-xl bg-amber-50 p-4">
+                    <p className="font-semibold text-amber-700">
+                      Waiting for your Group Leader
+                    </p>
+
+                    <p className="mt-1 text-sm text-amber-600">
+                      Only the Group Leader can acknowledge this submission.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

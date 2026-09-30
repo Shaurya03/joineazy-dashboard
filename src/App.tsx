@@ -188,6 +188,83 @@ function App() {
     )
   }
 
+  const handleAcknowledgeGroupSubmission = (assignmentId: string) => {
+    if (!currentUser || currentUser.role !== "student") {
+      return
+    }
+
+    const assignment = assignmentData.find(
+      (item) => item.id === assignmentId
+    )
+
+    if (!assignment || assignment.submissionType !== "group") {
+      return
+    }
+
+    const currentMembership = groupMemberData.find(
+      (member) =>
+        member.studentId === currentUser.id &&
+        groupData.some(
+          (group) =>
+            group.id === member.groupId &&
+            group.courseId === assignment.courseId
+        )
+    )
+
+    if (!currentMembership) {
+      return
+    }
+
+    const currentGroup = groupData.find(
+      (group) => group.id === currentMembership.groupId
+    )
+
+    if (!currentGroup || currentGroup.leaderId !== currentUser.id) {
+      return
+    }
+
+    const groupStudentIds = groupMemberData
+      .filter((member) => member.groupId === currentGroup.id)
+      .map((member) => member.studentId)
+
+    const acknowledgedAt = new Date().toISOString()
+
+    setSubmissionData((currentSubmissions) => {
+      const updatedSubmissions: Submission[] = currentSubmissions.map(
+        (submission): Submission =>
+          submission.assignmentId === assignmentId &&
+            submission.groupId === currentGroup.id &&
+            groupStudentIds.includes(submission.studentId)
+            ? {
+              ...submission,
+              status: "submitted",
+              acknowledgedAt,
+            }
+            : submission
+      )
+
+      const existingStudentIds = updatedSubmissions
+        .filter(
+          (submission) =>
+            submission.assignmentId === assignmentId &&
+            submission.groupId === currentGroup.id
+        )
+        .map((submission) => submission.studentId)
+
+      const missingSubmissions: Submission[] = groupStudentIds
+        .filter((studentId) => !existingStudentIds.includes(studentId))
+        .map((studentId) => ({
+          id: `submission-${Date.now()}-${studentId}`,
+          assignmentId,
+          studentId,
+          groupId: currentGroup.id,
+          status: "submitted",
+          acknowledgedAt,
+        }))
+      return [...updatedSubmissions, ...missingSubmissions]
+    })
+  }
+
   const handleCreateAssignment = (assignment: Assignment) => {
     setAssignmentData((currentAssignments) => [
       ...currentAssignments,
@@ -273,6 +350,7 @@ function App() {
             users={users}
             onBack={() => setSelectedAssignmentId(null)}
             onAcknowledge={handleAcknowledgeSubmission}
+            onAcknowledgeGroupSubmission={handleAcknowledgeGroupSubmission}
             onCreateGroup={handleCreateGroup}
             onJoinGroup={handleJoinGroup}
           />
