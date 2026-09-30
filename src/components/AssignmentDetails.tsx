@@ -1,4 +1,5 @@
 import GroupPanel from "./GroupPanel"
+import ProfessorSubmissionReport from "./ProfessorSubmissionReport"
 
 import type {
   Assignment,
@@ -205,32 +206,44 @@ function AssignmentDetails({
           </p>
         </div>
 
-        <div className="bg-gray-50/70 p-6 sm:p-8">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-base font-semibold text-gray-900">
-                  Submission workspace
-                </h2>
+        {isProfessor ? (
+          <div className="bg-gray-50/70 p-6 sm:p-8">
+            <ProfessorSubmissionReport
+              assignment={assignment}
+              course={course}
+              submissions={submissions}
+              groups={groups}
+              groupMembers={groupMembers}
+              users={users}
+            />
+          </div>
+        ) : (
+          <div className="bg-gray-50/70 p-6 sm:p-8">
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-900">
+                    Submission workspace
+                  </h2>
 
-                <p className="mt-1 text-sm text-gray-500">
-                  Open the shared OneDrive location for this assignment.
-                </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Open the shared OneDrive location for this
+                    assignment.
+                  </p>
+                </div>
+
+                <a
+                  href={assignment.oneDriveLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
+                >
+                  Open OneDrive
+                  <span className="ml-2">↗</span>
+                </a>
               </div>
 
-              <a
-                href={assignment.oneDriveLink}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
-              >
-                Open OneDrive
-                <span className="ml-2">↗</span>
-              </a>
-            </div>
-
-            {!isProfessor &&
-              assignment.submissionType === "individual" && (
+              {assignment.submissionType === "individual" && (
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                   {isSubmitted ? (
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -267,8 +280,8 @@ function AssignmentDetails({
                         </p>
 
                         <p className="mt-1 max-w-xl text-sm text-gray-500">
-                          Confirm your submission after uploading your work
-                          to OneDrive.
+                          Confirm your submission after uploading
+                          your work to OneDrive.
                         </p>
                       </div>
 
@@ -286,8 +299,7 @@ function AssignmentDetails({
                 </div>
               )}
 
-            {!isProfessor &&
-              assignment.submissionType === "group" && (
+              {assignment.submissionType === "group" && (
                 <GroupPanel
                   currentUser={currentUser}
                   course={course}
@@ -299,80 +311,81 @@ function AssignmentDetails({
                 />
               )}
 
-            {assignment.submissionType === "group" &&
-              currentGroup && (
-                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="mb-4">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-violet-600">
-                      Group submission
-                    </p>
-
-                    <h3 className="mt-1 text-xl font-semibold text-gray-900">
-                      {currentGroup.name}
-                    </h3>
-                  </div>
-
-                  {groupAcknowledged ? (
-                    <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-                      <p className="font-semibold text-emerald-700">
-                        Group submission acknowledged
+              {assignment.submissionType === "group" &&
+                currentGroup && (
+                  <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-violet-600">
+                        Group submission
                       </p>
 
-                      {groupAcknowledgedAt && (
-                        <p className="mt-1 text-sm text-emerald-600">
-                          Acknowledged on{" "}
-                          {new Date(
-                            groupAcknowledgedAt
-                          ).toLocaleString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hour12: true,
-                          })}
+                      <h3 className="mt-1 text-xl font-semibold text-gray-900">
+                        {currentGroup.name}
+                      </h3>
+                    </div>
+
+                    {groupAcknowledged ? (
+                      <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                        <p className="font-semibold text-emerald-700">
+                          Group submission acknowledged
                         </p>
-                      )}
-                    </div>
-                  ) : isGroupLeader ? (
-                    <div className="rounded-xl border border-violet-100 bg-violet-50 p-4">
-                      <p className="font-semibold text-gray-900">
-                        You are the Group Leader
-                      </p>
 
-                      <p className="mt-1 text-sm leading-6 text-gray-600">
-                        Acknowledge the submission once your group
-                        has submitted the assignment.
-                      </p>
+                        {groupAcknowledgedAt && (
+                          <p className="mt-1 text-sm text-emerald-600">
+                            Acknowledged on{" "}
+                            {new Date(
+                              groupAcknowledgedAt
+                            ).toLocaleString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            })}
+                          </p>
+                        )}
+                      </div>
+                    ) : isGroupLeader ? (
+                      <div className="rounded-xl border border-violet-100 bg-violet-50 p-4">
+                        <p className="font-semibold text-gray-900">
+                          You are the Group Leader
+                        </p>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onAcknowledgeGroupSubmission(
-                            assignment.id
-                          )
-                        }
-                        className="mt-4 inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
-                      >
-                        Acknowledge Group Submission
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
-                      <p className="font-semibold text-amber-700">
-                        Waiting for your Group Leader
-                      </p>
+                        <p className="mt-1 text-sm leading-6 text-gray-600">
+                          Acknowledge the submission once your group
+                          has submitted the assignment.
+                        </p>
 
-                      <p className="mt-1 text-sm leading-6 text-amber-600">
-                        Only the Group Leader can acknowledge this
-                        submission.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onAcknowledgeGroupSubmission(
+                              assignment.id
+                            )
+                          }
+                          className="mt-4 inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
+                        >
+                          Acknowledge Group Submission
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
+                        <p className="font-semibold text-amber-700">
+                          Waiting for your Group Leader
+                        </p>
+
+                        <p className="mt-1 text-sm leading-6 text-amber-600">
+                          Only the Group Leader can acknowledge this
+                          submission.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

@@ -214,6 +214,7 @@ function App() {
               course={selectedCourse}
               assignments={assignmentData}
               submissions={submissionData}
+              groups={groupData}
               onBack={() => {
                 setSelectedCourseId(null)
                 setSelectedAssignmentId(null)

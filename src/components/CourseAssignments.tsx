@@ -5,6 +5,7 @@ import type {
   Course,
   Submission,
   User,
+  Group,
 } from "../types"
 
 type CourseAssignmentsProps = {
@@ -12,6 +13,7 @@ type CourseAssignmentsProps = {
   course: Course
   assignments: Assignment[]
   submissions: Submission[]
+  groups: Group[]
   onBack: () => void
   onAssignmentSelect: (assignmentId: string) => void
   onCreateAssignment: () => void
@@ -24,6 +26,7 @@ function CourseAssignments({
   course,
   assignments,
   submissions,
+  groups,
   onBack,
   onAssignmentSelect,
   onCreateAssignment,
@@ -47,12 +50,8 @@ function CourseAssignments({
     )
 
     if (assignment.submissionType === "group") {
-      const groupIds = new Set(
-        assignmentSubmissions
-          .map((submission) => submission.groupId)
-          .filter(
-            (groupId): groupId is string => Boolean(groupId)
-          )
+      const courseGroups = groups.filter(
+        (group) => group.courseId === course.id
       )
 
       const submittedGroupIds = new Set(
@@ -66,8 +65,11 @@ function CourseAssignments({
           )
       )
 
-      const total = groupIds.size
-      const submitted = submittedGroupIds.size
+      const total = courseGroups.length
+      const submitted = courseGroups.filter((group) =>
+        submittedGroupIds.has(group.id)
+      ).length
+
       const pending = Math.max(total - submitted, 0)
 
       const progress =
