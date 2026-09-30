@@ -420,6 +420,7 @@ function App() {
                 setIsAssignmentFormOpen(true)
               }}
               onEditAssignment={handleEditAssignment}
+              onDeleteAssignment={handleDeleteAssignment}
             />
           </>
         ) : (

@@ -9,6 +9,7 @@ type CourseAssignmentsProps = {
   onAssignmentSelect: (assignmentId: string) => void
   onCreateAssignment: () => void
   onEditAssignment: (assignment: Assignment) => void
+  onDeleteAssignment: (assignmentId: string) => void
 }
 
 function CourseAssignments({
@@ -20,6 +21,7 @@ function CourseAssignments({
   onAssignmentSelect,
   onCreateAssignment,
   onEditAssignment,
+  onDeleteAssignment
 }: CourseAssignmentsProps) {
   const courseAssignments = assignments.filter(
     (assignment) => assignment.courseId === course.id
@@ -134,8 +136,8 @@ function CourseAssignments({
 
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium ${assignment.submissionType === "group"
-                            ? "bg-violet-50 text-violet-700"
-                            : "bg-blue-50 text-blue-700"
+                          ? "bg-violet-50 text-violet-700"
+                          : "bg-blue-50 text-blue-700"
                           }`}
                       >
                         {assignment.submissionType === "group"
@@ -171,13 +173,31 @@ function CourseAssignments({
                     </button>
 
                     {isProfessor && (
-                      <button
-                        type="button"
-                        onClick={() => onEditAssignment(assignment)}
-                        className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                      >
-                        Edit
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => onEditAssignment(assignment)}
+                          className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const confirmed = window.confirm(
+                              `Delete "${assignment.title}"?`
+                            )
+
+                            if (confirmed) {
+                              onDeleteAssignment(assignment.id)
+                            }
+                          }}
+                          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                        >
+                          Delete
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
