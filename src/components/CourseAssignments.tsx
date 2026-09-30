@@ -33,23 +33,59 @@ function CourseAssignments({
 
   const isProfessor = currentUser.role === "admin"
 
-  const getProgress = (assignment: Assignment) => {
+  const getAnalytics = (assignment: Assignment) => {
     const assignmentSubmissions = submissions.filter(
-      (submission) =>
-        submission.assignmentId === assignment.id
+      (submission) => submission.assignmentId === assignment.id
     )
 
-    if (assignmentSubmissions.length === 0) {
-      return 0
+    if (assignment.submissionType === "group") {
+      const groupIds = new Set(
+        assignmentSubmissions
+          .map((submission) => submission.groupId)
+          .filter((groupId): groupId is string => Boolean(groupId))
+      )
+
+      const submittedGroupIds = new Set(
+        assignmentSubmissions
+          .filter((submission) => submission.status === "submitted")
+          .map((submission) => submission.groupId)
+          .filter((groupId): groupId is string => Boolean(groupId))
+      )
+
+      const total = groupIds.size
+      const submitted = submittedGroupIds.size
+      const pending = Math.max(total - submitted, 0)
+
+      const progress =
+        total === 0 ? 0 : Math.round((submitted / total) * 100)
+
+      return {
+        total,
+        submitted,
+        pending,
+        progress,
+        unit: "groups",
+      }
     }
 
-    const submittedCount = assignmentSubmissions.filter(
+    const total = course.studentIds.length
+
+    const submitted = assignmentSubmissions.filter(
       (submission) => submission.status === "submitted"
     ).length
 
-    return Math.round(
-      (submittedCount / assignmentSubmissions.length) * 100
-    )
+    const pending = Math.max(total - submitted, 0)
+
+    const progress =
+      total === 0 ? 0 : Math.round((submitted / total) * 100)
+
+    return {
+      total,
+      submitted,
+      pending,
+      progress,
+      unit: "students",
+    }
   }
 
   const formatDueDate = (dueDate: string) => {
@@ -133,7 +169,7 @@ function CourseAssignments({
       ) : (
         <div className="space-y-4">
           {courseAssignments.map((assignment) => {
-            const progress = getProgress(assignment)
+            const analytics = getAnalytics(assignment)
 
             return (
               <div
@@ -219,15 +255,29 @@ function CourseAssignments({
                       </span>
 
                       <span className="text-xs font-semibold text-gray-700">
-                        {progress}%
+                        {analytics.submitted} / {analytics.total}{" "}
+                        {analytics.unit}
                       </span>
                     </div>
 
                     <div className="h-2 overflow-hidden rounded-full bg-gray-100">
                       <div
                         className="h-full rounded-full bg-blue-600 transition-all duration-300"
-                        style={{ width: `${progress}%` }}
+                        style={{
+                          width: `${analytics.progress}%`,
+                        }}
                       />
+                    </div>
+
+                    <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                      <span>
+                        {analytics.submitted} submitted ·{" "}
+                        {analytics.pending} pending
+                      </span>
+
+                      <span className="font-medium text-gray-700">
+                        {analytics.progress}%
+                      </span>
                     </div>
                   </div>
                 )}
