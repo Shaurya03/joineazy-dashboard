@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { Assignment, Course, Submission, User } from "../types"
 
 type CourseAssignmentsProps = {
@@ -21,8 +22,11 @@ function CourseAssignments({
   onAssignmentSelect,
   onCreateAssignment,
   onEditAssignment,
-  onDeleteAssignment
+  onDeleteAssignment,
 }: CourseAssignmentsProps) {
+  const [assignmentToDelete, setAssignmentToDelete] =
+    useState<Assignment | null>(null)
+
   const courseAssignments = assignments.filter(
     (assignment) => assignment.courseId === course.id
   )
@@ -54,6 +58,15 @@ function CourseAssignments({
       month: "short",
       year: "numeric",
     })
+  }
+
+  const handleDeleteConfirm = () => {
+    if (!assignmentToDelete) {
+      return
+    }
+
+    onDeleteAssignment(assignmentToDelete.id)
+    setAssignmentToDelete(null)
   }
 
   return (
@@ -136,8 +149,8 @@ function CourseAssignments({
 
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium ${assignment.submissionType === "group"
-                          ? "bg-violet-50 text-violet-700"
-                          : "bg-blue-50 text-blue-700"
+                            ? "bg-violet-50 text-violet-700"
+                            : "bg-blue-50 text-blue-700"
                           }`}
                       >
                         {assignment.submissionType === "group"
@@ -176,7 +189,9 @@ function CourseAssignments({
                       <>
                         <button
                           type="button"
-                          onClick={() => onEditAssignment(assignment)}
+                          onClick={() =>
+                            onEditAssignment(assignment)
+                          }
                           className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
                         >
                           Edit
@@ -184,15 +199,9 @@ function CourseAssignments({
 
                         <button
                           type="button"
-                          onClick={() => {
-                            const confirmed = window.confirm(
-                              `Delete "${assignment.title}"?`
-                            )
-
-                            if (confirmed) {
-                              onDeleteAssignment(assignment.id)
-                            }
-                          }}
+                          onClick={() =>
+                            setAssignmentToDelete(assignment)
+                          }
                           className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                         >
                           Delete
@@ -225,6 +234,46 @@ function CourseAssignments({
               </div>
             )
           })}
+        </div>
+      )}
+
+      {assignmentToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Delete assignment?
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-gray-500">
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-gray-900">
+                "{assignmentToDelete.title}"
+              </span>
+              ?
+            </p>
+
+            <p className="mt-2 text-sm text-gray-500">
+              This action cannot be undone.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setAssignmentToDelete(null)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
