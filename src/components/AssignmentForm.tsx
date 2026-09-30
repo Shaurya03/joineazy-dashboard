@@ -117,6 +117,12 @@ function AssignmentForm({
     setDueDate("")
     setOneDriveLink("")
     setSubmissionType("individual")
+
+    setIsClosing(true)
+
+    window.setTimeout(() => {
+      onCancel()
+    }, 180)
   }
 
   return (

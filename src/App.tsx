@@ -196,14 +196,10 @@ function App() {
                   assignmentToEdit={assignmentToEdit}
                   onCreateAssignment={(assignment) => {
                     handleCreateAssignment(assignment)
-                    setIsAssignmentFormOpen(false)
-                    setAssignmentToEdit(undefined)
                     showToast("Assignment created successfully")
                   }}
                   onUpdateAssignment={(assignment) => {
                     handleUpdateAssignment(assignment)
-                    setIsAssignmentFormOpen(false)
-                    setAssignmentToEdit(undefined)
                     showToast("Assignment updated successfully")
                   }}
                   onCancel={() => {
