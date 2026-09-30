@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import type {
   Assignment,
@@ -32,6 +32,8 @@ function CourseAssignments({
 }: CourseAssignmentsProps) {
   const [assignmentToDelete, setAssignmentToDelete] =
     useState<Assignment | null>(null)
+
+  const [isClosing, setIsClosing] = useState(false)
 
   const courseAssignments = assignments.filter(
     (assignment) => assignment.courseId === course.id
@@ -120,14 +122,45 @@ function CourseAssignments({
     })
   }
 
+  const handleCloseDeleteModal = () => {
+    if (isClosing) {
+      return
+    }
+
+    setIsClosing(true)
+
+    window.setTimeout(() => {
+      setAssignmentToDelete(null)
+      setIsClosing(false)
+    }, 180)
+  }
+
   const handleDeleteConfirm = () => {
-    if (!assignmentToDelete) {
+    if (!assignmentToDelete || isClosing) {
       return
     }
 
     onDeleteAssignment(assignmentToDelete.id)
-    setAssignmentToDelete(null)
+    handleCloseDeleteModal()
   }
+
+  useEffect(() => {
+    if (!assignmentToDelete) {
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        handleCloseDeleteModal()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [assignmentToDelete, isClosing])
 
   return (
     <div>
@@ -165,7 +198,9 @@ function CourseAssignments({
               + Create Assignment
             </button>
           )}
+        </div>
 
+        <div className="mt-6 grid max-w-xs grid-cols-1">
           <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p className="text-xs text-gray-500">
               Assignments
@@ -194,6 +229,7 @@ function CourseAssignments({
         <div className="space-y-4">
           {courseAssignments.map((assignment) => {
             const analytics = getAnalytics(assignment)
+
             const studentSubmission =
               getStudentSubmission(assignment)
 
@@ -214,8 +250,8 @@ function CourseAssignments({
 
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium ${assignment.submissionType === "group"
-                          ? "bg-violet-50 text-violet-700"
-                          : "bg-blue-50 text-blue-700"
+                            ? "bg-violet-50 text-violet-700"
+                            : "bg-blue-50 text-blue-700"
                           }`}
                       >
                         {assignment.submissionType === "group"
@@ -226,8 +262,8 @@ function CourseAssignments({
                       {!isProfessor && (
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${isStudentSubmitted
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-amber-50 text-amber-700"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-amber-50 text-amber-700"
                             }`}
                         >
                           {isStudentSubmitted
@@ -330,9 +366,17 @@ function CourseAssignments({
       )}
 
       {assignmentToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-[2px]">
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-[2px] ${isClosing
+              ? "animate-[fadeOut_0.18s_ease-in_forwards]"
+              : "animate-[fadeIn_0.18s_ease-out]"
+            }`}
+        >
           <div
-            className="w-full max-w-md animate-[slideIn_0.2s_ease-out] rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl"
+            className={`w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl ${isClosing
+                ? "animate-[slideOut_0.18s_ease-in_forwards]"
+                : "animate-[slideIn_0.2s_ease-out]"
+              }`}
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-assignment-title"
@@ -365,8 +409,9 @@ function CourseAssignments({
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setAssignmentToDelete(null)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
+                onClick={handleCloseDeleteModal}
+                disabled={isClosing}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-sm active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -374,7 +419,8 @@ function CourseAssignments({
               <button
                 type="button"
                 onClick={handleDeleteConfirm}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
+                disabled={isClosing}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Delete
               </button>
