@@ -398,6 +398,10 @@ function App() {
                   setIsAssignmentFormOpen(false)
                   setAssignmentToEdit(undefined)
                 }}
+                onCancel={() => {
+                  setIsAssignmentFormOpen(false)
+                  setAssignmentToEdit(undefined)
+                }}
               />
             )}
 
