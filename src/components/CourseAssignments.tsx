@@ -1,5 +1,11 @@
 import { useState } from "react"
-import type { Assignment, Course, Submission, User } from "../types"
+
+import type {
+  Assignment,
+  Course,
+  Submission,
+  User,
+} from "../types"
 
 type CourseAssignmentsProps = {
   currentUser: User
@@ -42,14 +48,20 @@ function CourseAssignments({
       const groupIds = new Set(
         assignmentSubmissions
           .map((submission) => submission.groupId)
-          .filter((groupId): groupId is string => Boolean(groupId))
+          .filter(
+            (groupId): groupId is string => Boolean(groupId)
+          )
       )
 
       const submittedGroupIds = new Set(
         assignmentSubmissions
-          .filter((submission) => submission.status === "submitted")
+          .filter(
+            (submission) => submission.status === "submitted"
+          )
           .map((submission) => submission.groupId)
-          .filter((groupId): groupId is string => Boolean(groupId))
+          .filter(
+            (groupId): groupId is string => Boolean(groupId)
+          )
       )
 
       const total = groupIds.size
@@ -57,7 +69,9 @@ function CourseAssignments({
       const pending = Math.max(total - submitted, 0)
 
       const progress =
-        total === 0 ? 0 : Math.round((submitted / total) * 100)
+        total === 0
+          ? 0
+          : Math.round((submitted / total) * 100)
 
       return {
         total,
@@ -77,7 +91,9 @@ function CourseAssignments({
     const pending = Math.max(total - submitted, 0)
 
     const progress =
-      total === 0 ? 0 : Math.round((submitted / total) * 100)
+      total === 0
+        ? 0
+        : Math.round((submitted / total) * 100)
 
     return {
       total,
@@ -118,7 +134,7 @@ function CourseAssignments({
       <button
         type="button"
         onClick={onBack}
-        className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+        className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-all duration-200 hover:-translate-x-0.5 hover:text-gray-900"
       >
         <span>←</span>
         Back to courses
@@ -144,13 +160,13 @@ function CourseAssignments({
             <button
               type="button"
               onClick={onCreateAssignment}
-              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
             >
               + Create Assignment
             </button>
           )}
 
-          <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <p className="text-xs text-gray-500">
               Assignments
             </p>
@@ -178,7 +194,9 @@ function CourseAssignments({
         <div className="space-y-4">
           {courseAssignments.map((assignment) => {
             const analytics = getAnalytics(assignment)
-            const studentSubmission = getStudentSubmission(assignment)
+            const studentSubmission =
+              getStudentSubmission(assignment)
+
             const isStudentSubmitted =
               studentSubmission?.status === "submitted"
 
@@ -196,8 +214,8 @@ function CourseAssignments({
 
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium ${assignment.submissionType === "group"
-                            ? "bg-violet-50 text-violet-700"
-                            : "bg-blue-50 text-blue-700"
+                          ? "bg-violet-50 text-violet-700"
+                          : "bg-blue-50 text-blue-700"
                           }`}
                       >
                         {assignment.submissionType === "group"
@@ -208,8 +226,8 @@ function CourseAssignments({
                       {!isProfessor && (
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${isStudentSubmitted
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-amber-50 text-amber-700"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-amber-50 text-amber-700"
                             }`}
                         >
                           {isStudentSubmitted
@@ -240,7 +258,7 @@ function CourseAssignments({
                       onClick={() =>
                         onAssignmentSelect(assignment.id)
                       }
-                      className="text-sm font-medium text-blue-600 transition-transform hover:translate-x-1"
+                      className="text-sm font-medium text-blue-600 transition-all duration-200 hover:translate-x-1 hover:text-blue-700 active:scale-95"
                     >
                       View →
                     </button>
@@ -252,7 +270,7 @@ function CourseAssignments({
                           onClick={() =>
                             onEditAssignment(assignment)
                           }
-                          className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                          className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
                         >
                           Edit
                         </button>
@@ -262,7 +280,7 @@ function CourseAssignments({
                           onClick={() =>
                             setAssignmentToDelete(assignment)
                           }
-                          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-50 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
                         >
                           Delete
                         </button>
@@ -279,14 +297,14 @@ function CourseAssignments({
                       </span>
 
                       <span className="text-xs font-semibold text-gray-700">
-                        {analytics.submitted} / {analytics.total}{" "}
-                        {analytics.unit}
+                        {analytics.submitted} /{" "}
+                        {analytics.total} {analytics.unit}
                       </span>
                     </div>
 
                     <div className="h-2 overflow-hidden rounded-full bg-gray-100">
                       <div
-                        className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                        className="h-full rounded-full bg-blue-600 transition-all duration-500 ease-out"
                         style={{
                           width: `${analytics.progress}%`,
                         }}
@@ -312,11 +330,25 @@ function CourseAssignments({
       )}
 
       {assignmentToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Delete assignment?
-            </h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-[2px]">
+          <div
+            className="w-full max-w-md animate-[slideIn_0.2s_ease-out] rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-assignment-title"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-sm font-semibold text-red-600">
+                !
+              </div>
+
+              <h2
+                id="delete-assignment-title"
+                className="text-lg font-semibold text-gray-900"
+              >
+                Delete assignment?
+              </h2>
+            </div>
 
             <p className="mt-2 text-sm leading-6 text-gray-500">
               Are you sure you want to delete{" "}
@@ -334,7 +366,7 @@ function CourseAssignments({
               <button
                 type="button"
                 onClick={() => setAssignmentToDelete(null)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
               >
                 Cancel
               </button>
@@ -342,7 +374,7 @@ function CourseAssignments({
               <button
                 type="button"
                 onClick={handleDeleteConfirm}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
               >
                 Delete
               </button>
