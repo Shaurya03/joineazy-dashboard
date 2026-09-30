@@ -19,6 +19,8 @@ function App() {
 
   const [isAssignmentFormOpen, setIsAssignmentFormOpen] = useState(false)
 
+  const [assignmentToEdit, setAssignmentToEdit] = useState<Assignment | undefined>(undefined)
+
   const [assignmentData, setAssignmentData] = useState<Assignment[]>(() => {
     const storedAssignments = localStorage.getItem("assignments")
 
@@ -316,6 +318,11 @@ function App() {
     )
   }
 
+  const handleEditAssignment = (assignment: Assignment) => {
+    setAssignmentToEdit(assignment)
+    setIsAssignmentFormOpen(true)
+  }
+
   const handleDeleteAssignment = (assignmentId: string) => {
     setAssignmentData((currentAssignments) =>
       currentAssignments.filter(
@@ -380,11 +387,17 @@ function App() {
               <AssignmentForm
                 currentUserId={currentUser.id}
                 courseId={selectedCourse.id}
+                assignmentToEdit={assignmentToEdit}
                 onCreateAssignment={(assignment) => {
                   handleCreateAssignment(assignment)
                   setIsAssignmentFormOpen(false)
+                  setAssignmentToEdit(undefined)
                 }}
-                onUpdateAssignment={handleUpdateAssignment}
+                onUpdateAssignment={(assignment) => {
+                  handleUpdateAssignment(assignment)
+                  setIsAssignmentFormOpen(false)
+                  setAssignmentToEdit(undefined)
+                }}
               />
             )}
 
@@ -398,7 +411,11 @@ function App() {
                 setIsAssignmentFormOpen(false)
               }}
               onAssignmentSelect={handleAssignmentSelect}
-              onCreateAssignment={() => setIsAssignmentFormOpen(true)}
+              onCreateAssignment={() => {
+                setAssignmentToEdit(undefined)
+                setIsAssignmentFormOpen(true)
+              }}
+              onEditAssignment={handleEditAssignment}
             />
           </>
         ) : (

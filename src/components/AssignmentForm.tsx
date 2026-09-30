@@ -25,7 +25,7 @@ function AssignmentForm({
   )
 
   const [dueDate, setDueDate] = useState(
-    assignmentToEdit?.dueDate ?? ""
+    assignmentToEdit?.dueDate?.split("T")[0] ?? ""
   )
 
   const [oneDriveLink, setOneDriveLink] = useState(
@@ -41,7 +41,9 @@ function AssignmentForm({
   useEffect(() => {
     setTitle(assignmentToEdit?.title ?? "")
     setDescription(assignmentToEdit?.description ?? "")
-    setDueDate(assignmentToEdit?.dueDate ?? "")
+    setDueDate(
+      assignmentToEdit?.dueDate?.split("T")[0] ?? ""
+    )
     setOneDriveLink(assignmentToEdit?.oneDriveLink ?? "")
     setSubmissionType(
       assignmentToEdit?.submissionType ?? "individual"
@@ -53,14 +55,16 @@ function AssignmentForm({
   ) => {
     event.preventDefault()
 
+    const formattedDueDate = `${dueDate}T23:59`
+
     if (assignmentToEdit) {
       onUpdateAssignment({
         ...assignmentToEdit,
         title,
         description,
-        dueDate,
+        dueDate: formattedDueDate,
         oneDriveLink,
-        submissionType
+        submissionType,
       })
     } else {
       const newAssignment: Assignment = {
@@ -68,7 +72,7 @@ function AssignmentForm({
         courseId,
         title,
         description,
-        dueDate,
+        dueDate: formattedDueDate,
         oneDriveLink,
         submissionType,
         createdBy: currentUserId,

@@ -8,6 +8,7 @@ type CourseAssignmentsProps = {
   onBack: () => void
   onAssignmentSelect: (assignmentId: string) => void
   onCreateAssignment: () => void
+  onEditAssignment: (assignment: Assignment) => void
 }
 
 function CourseAssignments({
@@ -17,7 +18,8 @@ function CourseAssignments({
   submissions,
   onBack,
   onAssignmentSelect,
-  onCreateAssignment
+  onCreateAssignment,
+  onEditAssignment,
 }: CourseAssignmentsProps) {
   const courseAssignments = assignments.filter(
     (assignment) => assignment.courseId === course.id
@@ -42,6 +44,14 @@ function CourseAssignments({
     return Math.round(
       (submittedCount / assignmentSubmissions.length) * 100
     )
+  }
+
+  const formatDueDate = (dueDate: string) => {
+    return new Date(dueDate).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })
   }
 
   return (
@@ -85,6 +95,7 @@ function CourseAssignments({
             <p className="text-xs text-gray-500">
               Assignments
             </p>
+
             <p className="mt-1 text-xl font-bold text-gray-900">
               {courseAssignments.length}
             </p>
@@ -110,12 +121,8 @@ function CourseAssignments({
             const progress = getProgress(assignment)
 
             return (
-              <button
+              <div
                 key={assignment.id}
-                type="button"
-                onClick={() =>
-                  onAssignmentSelect(assignment.id)
-                }
                 className="group w-full rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -127,8 +134,8 @@ function CourseAssignments({
 
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium ${assignment.submissionType === "group"
-                          ? "bg-violet-50 text-violet-700"
-                          : "bg-blue-50 text-blue-700"
+                            ? "bg-violet-50 text-violet-700"
+                            : "bg-blue-50 text-blue-700"
                           }`}
                       >
                         {assignment.submissionType === "group"
@@ -143,7 +150,7 @@ function CourseAssignments({
 
                     <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500">
                       <span>
-                        Due {assignment.dueDate}
+                        Due {formatDueDate(assignment.dueDate)}
                       </span>
 
                       <span>
@@ -152,9 +159,27 @@ function CourseAssignments({
                     </div>
                   </div>
 
-                  <span className="shrink-0 text-sm font-medium text-blue-600 transition-transform group-hover:translate-x-1">
-                    View →
-                  </span>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onAssignmentSelect(assignment.id)
+                      }
+                      className="text-sm font-medium text-blue-600 transition-transform hover:translate-x-1"
+                    >
+                      View →
+                    </button>
+
+                    {isProfessor && (
+                      <button
+                        type="button"
+                        onClick={() => onEditAssignment(assignment)}
+                        className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {isProfessor && (
@@ -177,7 +202,7 @@ function CourseAssignments({
                     </div>
                   </div>
                 )}
-              </button>
+              </div>
             )
           })}
         </div>
