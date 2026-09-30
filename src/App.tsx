@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import Navbar from "./components/Navbar"
 import Login from "./components/Login"
@@ -6,12 +6,18 @@ import CourseDashboard from "./components/CourseDashboard"
 import CourseAssignments from "./components/CourseAssignments"
 import AssignmentDetails from "./components/AssignmentDetails"
 import AssignmentForm from "./components/AssignmentForm"
+import Toast from "./components/Toast"
 
 import { courses, users } from "./data/mockData"
 
 import type { Assignment, User } from "./types"
 
 import useAppData from "./hooks/useAppData"
+
+type ToastState = {
+  message: string
+  type: "success" | "error"
+}
 
 function App() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
@@ -29,6 +35,8 @@ function App() {
 
   const [assignmentToEdit, setAssignmentToEdit] =
     useState<Assignment | undefined>(undefined)
+
+  const [toast, setToast] = useState<ToastState | null>(null)
 
   const {
     assignmentData,
@@ -55,6 +63,30 @@ function App() {
   const selectedAssignment = assignmentData.find(
     (assignment) => assignment.id === selectedAssignmentId
   )
+
+  useEffect(() => {
+    if (!toast) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setToast(null)
+    }, 3000)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [toast])
+
+  const showToast = (
+    message: string,
+    type: "success" | "error" = "success"
+  ) => {
+    setToast({
+      message,
+      type,
+    })
+  }
 
   const handleLogin = (user: User) => {
     setCurrentUserId(user.id)
@@ -92,6 +124,37 @@ function App() {
     setIsAssignmentFormOpen(true)
   }
 
+  const handleCreateGroupWithToast = (name: string) => {
+    handleCreateGroup(name)
+    showToast("Group created successfully")
+  }
+
+  const handleJoinGroupWithToast = (groupId: string) => {
+    handleJoinGroup(groupId)
+    showToast("Joined group successfully")
+  }
+
+  const handleAcknowledgeSubmissionWithToast = (
+    assignmentId: string
+  ) => {
+    handleAcknowledgeSubmission(assignmentId)
+    showToast("Assignment acknowledged")
+  }
+
+  const handleAcknowledgeGroupSubmissionWithToast = (
+    assignmentId: string
+  ) => {
+    handleAcknowledgeGroupSubmission(assignmentId)
+    showToast("Group assignment acknowledged")
+  }
+
+  const handleDeleteAssignmentWithToast = (
+    assignmentId: string
+  ) => {
+    handleDeleteAssignment(assignmentId)
+    showToast("Assignment deleted successfully")
+  }
+
   if (!currentUser) {
     return (
       <Login
@@ -116,12 +179,12 @@ function App() {
             groupMembers={groupMemberData}
             users={users}
             onBack={() => setSelectedAssignmentId(null)}
-            onAcknowledge={handleAcknowledgeSubmission}
+            onAcknowledge={handleAcknowledgeSubmissionWithToast}
             onAcknowledgeGroupSubmission={
-              handleAcknowledgeGroupSubmission
+              handleAcknowledgeGroupSubmissionWithToast
             }
-            onCreateGroup={handleCreateGroup}
-            onJoinGroup={handleJoinGroup}
+            onCreateGroup={handleCreateGroupWithToast}
+            onJoinGroup={handleJoinGroupWithToast}
           />
         ) : selectedCourse ? (
           <>
@@ -135,11 +198,13 @@ function App() {
                     handleCreateAssignment(assignment)
                     setIsAssignmentFormOpen(false)
                     setAssignmentToEdit(undefined)
+                    showToast("Assignment created successfully")
                   }}
                   onUpdateAssignment={(assignment) => {
                     handleUpdateAssignment(assignment)
                     setIsAssignmentFormOpen(false)
                     setAssignmentToEdit(undefined)
+                    showToast("Assignment updated successfully")
                   }}
                   onCancel={() => {
                     setIsAssignmentFormOpen(false)
@@ -165,7 +230,7 @@ function App() {
                 setIsAssignmentFormOpen(true)
               }}
               onEditAssignment={handleEditAssignment}
-              onDeleteAssignment={handleDeleteAssignment}
+              onDeleteAssignment={handleDeleteAssignmentWithToast}
             />
           </>
         ) : (
@@ -176,6 +241,14 @@ function App() {
           />
         )}
       </main>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }
