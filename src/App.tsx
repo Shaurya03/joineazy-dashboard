@@ -337,21 +337,6 @@ function App() {
     )
   }
 
-  const handleConfirmSubmission = (assignmentId: string) => {
-    setSubmissionData((currentSubmissions) =>
-      currentSubmissions.map((submission) =>
-        submission.assignmentId === assignmentId &&
-          submission.studentId === currentUserId
-          ? {
-            ...submission,
-            status: "submitted",
-            submittedAt: new Date().toISOString(),
-          }
-          : submission
-      )
-    )
-  }
-
   if (!currentUser) {
     return (
       <Login
