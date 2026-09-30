@@ -51,6 +51,7 @@ export const courses: Course[] = [
       "student-1",
       "student-2",
       "student-3",
+      "student-4",
     ],
   },
   {
@@ -114,12 +115,6 @@ export const groups: Group[] = [
     name: "Pixel Pioneers",
     leaderId: "student-1",
   },
-  {
-    id: "group-2",
-    courseId: "course-1",
-    name: "Code Crafters",
-    leaderId: "student-3",
-  },
 ]
 
 export const groupMembers: GroupMember[] = [
@@ -130,10 +125,6 @@ export const groupMembers: GroupMember[] = [
   {
     groupId: "group-1",
     studentId: "student-2",
-  },
-  {
-    groupId: "group-2",
-    studentId: "student-3",
   },
 ]
 
@@ -160,14 +151,26 @@ export const submissions: Submission[] = [
   },
   {
     id: "submission-4",
-    assignmentId: "assignment-2",
-    studentId: "student-1",
-    groupId: "group-1",
-    status: "submitted",
-    acknowledgedAt: "2026-09-28T11:20:00",
+    assignmentId: "assignment-1",
+    studentId: "student-4",
+    status: "not-submitted",
   },
   {
     id: "submission-5",
+    assignmentId: "assignment-2",
+    studentId: "student-1",
+    groupId: "group-1",
+    status: "not-submitted",
+  },
+  {
+    id: "submission-6",
+    assignmentId: "assignment-2",
+    studentId: "student-2",
+    groupId: "group-1",
+    status: "not-submitted",
+  },
+  {
+    id: "submission-7",
     assignmentId: "assignment-3",
     studentId: "student-1",
     status: "not-submitted",

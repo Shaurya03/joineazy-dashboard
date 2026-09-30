@@ -1,8 +1,11 @@
+import GroupPanel from "./GroupPanel"
 import type {
   Assignment,
   Course,
   Submission,
   User,
+  Group,
+  GroupMember
 } from "../types"
 
 type AssignmentDetailsProps = {
@@ -12,6 +15,11 @@ type AssignmentDetailsProps = {
   submissions: Submission[]
   onBack: () => void
   onAcknowledge: (assignmentId: string) => void
+  groups: Group[]
+  groupMembers: GroupMember[]
+  users: User[]
+  onCreateGroup: (name: string) => void
+  onJoinGroup: (groupId: string) => void
 }
 
 function AssignmentDetails({
@@ -20,7 +28,12 @@ function AssignmentDetails({
   course,
   submissions,
   onBack,
-  onAcknowledge
+  onAcknowledge,
+  groups,
+  groupMembers,
+  users,
+  onCreateGroup,
+  onJoinGroup
 }: AssignmentDetailsProps) {
   const isProfessor = currentUser.role === "admin"
 
@@ -213,15 +226,15 @@ function AssignmentDetails({
 
             {!isProfessor &&
               assignment.submissionType === "group" && (
-                <div className="rounded-xl border border-violet-100 bg-violet-50 p-5">
-                  <p className="text-sm font-semibold text-violet-900">
-                    Group submission
-                  </p>
-
-                  <p className="mt-1 text-sm text-violet-700">
-                    Group acknowledgment will be available here.
-                  </p>
-                </div>
+                <GroupPanel
+                  currentUser={currentUser}
+                  course={course}
+                  groups={groups}
+                  groupMembers={groupMembers}
+                  users={users}
+                  onCreateGroup={onCreateGroup}
+                  onJoinGroup={onJoinGroup}
+                />
               )}
           </div>
         </div>

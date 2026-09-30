@@ -4,8 +4,8 @@ import Login from "./components/Login"
 import CourseDashboard from "./components/CourseDashboard"
 import CourseAssignments from "./components/CourseAssignments"
 import AssignmentDetails from "./components/AssignmentDetails"
-import { courses, assignments, submissions, users } from "./data/mockData"
-import type { Assignment, Submission, User } from "./types"
+import { courses, assignments, submissions, users, groups, groupMembers } from "./data/mockData"
+import type { Assignment, Submission, User, Group, GroupMember } from "./types"
 
 function App() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
@@ -47,17 +47,55 @@ function App() {
     )
   }, [submissionData])
 
+  const [groupData, setGroupData] = useState<Group[]>(() => {
+    const storedGroups = localStorage.getItem("groups")
+
+    return storedGroups
+      ? JSON.parse(storedGroups)
+      : groups
+  })
+
+  const [groupMemberData, setGroupMemberData] =
+    useState<GroupMember[]>(() => {
+      const storedMembers =
+        localStorage.getItem("groupMembers")
+
+      return storedMembers
+        ? JSON.parse(storedMembers)
+        : groupMembers
+    })
+
+  useEffect(() => {
+    localStorage.setItem(
+      "groups",
+      JSON.stringify(groupData)
+    )
+  }, [groupData])
+
+  useEffect(() => {
+    localStorage.setItem(
+      "groupMembers",
+      JSON.stringify(groupMemberData)
+    )
+  }, [groupMemberData])
+
   const currentUser = users.find(
     (user) => user.id === currentUserId
   )
 
   const handleLogin = (user: User) => {
     setCurrentUserId(user.id)
+    setSelectedCourseId(null)
+    setSelectedAssignmentId(null)
+
     localStorage.setItem("currentUserId", user.id)
   }
 
   const handleLogout = () => {
     setCurrentUserId(null)
+    setSelectedCourseId(null)
+    setSelectedAssignmentId(null)
+
     localStorage.removeItem("currentUserId")
   }
 
@@ -68,6 +106,60 @@ function App() {
   const selectedCourse = courses.find(
     (course) => course.id === selectedCourseId
   )
+
+  const handleCreateGroup = (name: string) => {
+    if (!currentUser || currentUser.role !== "student" || !selectedCourse) {
+      return
+    }
+
+    const groupId = `group-${Date.now()}`
+
+    const newGroup: Group = {
+      id: groupId,
+      courseId: selectedCourse.id,
+      name,
+      leaderId: currentUser.id,
+    }
+
+    const newMember: GroupMember = {
+      groupId,
+      studentId: currentUser.id,
+    }
+
+    setGroupData((currentGroups) => [
+      ...currentGroups,
+      newGroup,
+    ])
+
+    setGroupMemberData((currentMembers) => [
+      ...currentMembers,
+      newMember,
+    ])
+  }
+
+  const handleJoinGroup = (groupId: string) => {
+    if (!currentUser || currentUser.role !== "student") {
+      return
+    }
+
+    const alreadyMember = groupMemberData.some(
+      (member) =>
+        member.groupId === groupId &&
+        member.studentId === currentUser.id
+    )
+
+    if (alreadyMember) {
+      return
+    }
+
+    setGroupMemberData((currentMembers) => [
+      ...currentMembers,
+      {
+        groupId,
+        studentId: currentUser.id,
+      },
+    ])
+  }
 
   const handleAssignmentSelect = (
     assignmentId: string
@@ -176,8 +268,13 @@ function App() {
             assignment={selectedAssignment}
             course={selectedCourse}
             submissions={submissionData}
+            groups={groupData}
+            groupMembers={groupMemberData}
+            users={users}
             onBack={() => setSelectedAssignmentId(null)}
             onAcknowledge={handleAcknowledgeSubmission}
+            onCreateGroup={handleCreateGroup}
+            onJoinGroup={handleJoinGroup}
           />
         ) : selectedCourse ? (
           <CourseAssignments
