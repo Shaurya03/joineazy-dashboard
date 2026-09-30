@@ -16,11 +16,19 @@ import type {
   Submission,
 } from "../types"
 
+const DATA_VERSION = "task-2"
+
 function useAppData(
   currentUserId: string | null,
   selectedCourseId: string | null
 ) {
   const [assignmentData, setAssignmentData] = useState<Assignment[]>(() => {
+    const storedVersion = localStorage.getItem("appDataVersion")
+
+    if (storedVersion !== DATA_VERSION) {
+      return assignments
+    }
+
     const storedAssignments = localStorage.getItem("assignments")
 
     return storedAssignments
@@ -29,6 +37,12 @@ function useAppData(
   })
 
   const [submissionData, setSubmissionData] = useState<Submission[]>(() => {
+    const storedVersion = localStorage.getItem("appDataVersion")
+
+    if (storedVersion !== DATA_VERSION) {
+      return submissions
+    }
+
     const storedSubmissions = localStorage.getItem("submissions")
 
     return storedSubmissions
@@ -37,6 +51,12 @@ function useAppData(
   })
 
   const [groupData, setGroupData] = useState<Group[]>(() => {
+    const storedVersion = localStorage.getItem("appDataVersion")
+
+    if (storedVersion !== DATA_VERSION) {
+      return groups
+    }
+
     const storedGroups = localStorage.getItem("groups")
 
     return storedGroups
@@ -44,15 +64,20 @@ function useAppData(
       : groups
   })
 
-  const [groupMemberData, setGroupMemberData] = useState<GroupMember[]>(
-    () => {
+  const [groupMemberData, setGroupMemberData] =
+    useState<GroupMember[]>(() => {
+      const storedVersion = localStorage.getItem("appDataVersion")
+
+      if (storedVersion !== DATA_VERSION) {
+        return groupMembers
+      }
+
       const storedMembers = localStorage.getItem("groupMembers")
 
       return storedMembers
         ? JSON.parse(storedMembers)
         : groupMembers
-    }
-  )
+    })
 
   useEffect(() => {
     localStorage.setItem(
@@ -81,6 +106,13 @@ function useAppData(
       JSON.stringify(groupMemberData)
     )
   }, [groupMemberData])
+
+  useEffect(() => {
+    localStorage.setItem(
+      "appDataVersion",
+      DATA_VERSION
+    )
+  }, [])
 
   const currentUser = users.find(
     (user) => user.id === currentUserId
