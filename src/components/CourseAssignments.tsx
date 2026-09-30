@@ -239,7 +239,22 @@ function CourseAssignments({
             return (
               <div
                 key={assignment.id}
-                className="group w-full rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                role="button"
+                tabIndex={0}
+                aria-label={`Open assignment: ${assignment.title}`}
+                onClick={() =>
+                  onAssignmentSelect(assignment.id)
+                }
+                onKeyDown={(event) => {
+                  if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                  ) {
+                    event.preventDefault()
+                    onAssignmentSelect(assignment.id)
+                  }
+                }}
+                className="group w-full cursor-pointer rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
@@ -289,23 +304,14 @@ function CourseAssignments({
                   </div>
 
                   <div className="flex shrink-0 items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onAssignmentSelect(assignment.id)
-                      }
-                      className="text-sm font-medium text-blue-600 transition-all duration-200 hover:translate-x-1 hover:text-blue-700 active:scale-95"
-                    >
-                      View →
-                    </button>
-
                     {isProfessor && (
                       <>
                         <button
                           type="button"
-                          onClick={() =>
+                          onClick={(event) => {
+                            event.stopPropagation()
                             onEditAssignment(assignment)
-                          }
+                          }}
                           className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
                         >
                           Edit
@@ -313,9 +319,10 @@ function CourseAssignments({
 
                         <button
                           type="button"
-                          onClick={() =>
+                          onClick={(event) => {
+                            event.stopPropagation()
                             setAssignmentToDelete(assignment)
-                          }
+                          }}
                           className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-50 hover:shadow-sm active:translate-y-0 active:scale-[0.98]"
                         >
                           Delete
