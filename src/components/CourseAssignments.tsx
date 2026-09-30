@@ -88,6 +88,14 @@ function CourseAssignments({
     }
   }
 
+  const getStudentSubmission = (assignment: Assignment) => {
+    return submissions.find(
+      (submission) =>
+        submission.assignmentId === assignment.id &&
+        submission.studentId === currentUser.id
+    )
+  }
+
   const formatDueDate = (dueDate: string) => {
     return new Date(dueDate).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -170,6 +178,9 @@ function CourseAssignments({
         <div className="space-y-4">
           {courseAssignments.map((assignment) => {
             const analytics = getAnalytics(assignment)
+            const studentSubmission = getStudentSubmission(assignment)
+            const isStudentSubmitted =
+              studentSubmission?.status === "submitted"
 
             return (
               <div
@@ -193,6 +204,19 @@ function CourseAssignments({
                           ? "Group"
                           : "Individual"}
                       </span>
+
+                      {!isProfessor && (
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-medium ${isStudentSubmitted
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-amber-50 text-amber-700"
+                            }`}
+                        >
+                          {isStudentSubmitted
+                            ? "✓ Acknowledged"
+                            : "Not acknowledged"}
+                        </span>
+                      )}
                     </div>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
