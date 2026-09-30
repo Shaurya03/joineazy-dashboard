@@ -33,10 +33,6 @@ function CourseCard({
             {course.semester}
           </p>
         </div>
-
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 text-gray-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600">
-          →
-        </div>
       </div>
 
       <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
